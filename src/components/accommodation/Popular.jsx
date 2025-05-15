@@ -1,11 +1,31 @@
 import { useEffect, useState } from "react";
+import { Spinner } from "react-bootstrap";
+import dayjs from 'dayjs';
+import 'dayjs/locale/th';
+import GetRoomAvailability from "../common/GetRoomAvailability";
 import AccommodationService from "../../services/api/accommodation/accommodation.service";
 import AccommodationCard from "./AccommodationCard";
-import { Spinner } from "react-bootstrap";
 
 const Popular = () => {
     const [populars, setPopulars] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [availabilityData, setAvailabilityData] = useState({});
+
+    const checkInDate = dayjs().add(1, 'day').toDate();
+    const checkOutDate = dayjs().add(2, 'day').toDate();
+
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (checkInDate && checkOutDate) {
+                const result = await GetRoomAvailability(checkInDate, checkOutDate);
+                setAvailabilityData(result);
+            }
+        };
+
+        fetchData();
+    }, [checkInDate, checkOutDate]);
 
     useEffect(() => {
         fetchPopularAccommodations();
@@ -23,6 +43,7 @@ const Popular = () => {
         }
     };
 
+
     return (
         <div className="row">
             {loading ? (
@@ -36,6 +57,7 @@ const Popular = () => {
                             <AccommodationCard
                                 key={acc.id}
                                 accommodation={acc}
+                                availabilityRoom={availabilityData[acc.id] || 0}
                             />
                         ))
                     ) : (

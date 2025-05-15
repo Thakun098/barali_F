@@ -2,10 +2,29 @@ import React, { useEffect, useState } from "react";
 import AccommodationService from "../../services/api/accommodation/accommodation.service";
 import AccommodationCard from "./AccommodationCard";
 import { Spinner } from "react-bootstrap";
+import dayjs from 'dayjs';
+import 'dayjs/locale/th';
+import GetRoomAvailability from "../common/GetRoomAvailability";
 
 const Promotion = () => {
     const [promotions, setPromotions] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const [availabilityData, setAvailabilityData] = useState({});
+
+    const checkInDate = dayjs().add(1, 'day').toDate();
+    const checkOutDate = dayjs().add(2, 'day').toDate();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (checkInDate && checkOutDate) {
+                const result = await GetRoomAvailability(checkInDate, checkOutDate);
+                setAvailabilityData(result);
+            }
+        };
+
+        fetchData();
+    }, [checkInDate, checkOutDate]);
 
     useEffect(() => {
         fetchPromotions();
@@ -36,6 +55,7 @@ const Promotion = () => {
                             <AccommodationCard
                                 key={promotion.id}
                                 accommodation={promotion}
+                                availabilityRoom={availabilityData[promotion.id] || 0}
                             />
                         ))
                     ) : (

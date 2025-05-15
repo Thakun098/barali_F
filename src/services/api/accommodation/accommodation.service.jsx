@@ -26,11 +26,23 @@ const getAll = () => {
     return axios.get(`${BASE_URL}/api/accommodation`, { headers: AuthHeader() });
 };
 
+const getAvailability = (checkInDate, checkOutDate) => {
+    return axios.get(`${BASE_URL}/api/accommodation/availability`, {
+        params: {
+            check_in: checkInDate,
+            check_out: checkOutDate
+        }
+    });
+
+    // console.log("getAvialability", checkInDate, checkOutDate);
+}
+
 const AccommodationService = {
     getPopularAccommodation,
     getPromotion,
     getAll,
-    getSearch
+    getSearch,
+    getAvailability
 }
 
 export default AccommodationService;
